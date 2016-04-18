@@ -144,6 +144,9 @@
                   <include>org.jolokia:jolokia-service-discovery</include>
                   <include>org.jolokia:jolokia-service-history</include>
                   <include>com.googlecode.json-simple:json-simple</include>
+                  <include>com.fasterxml.jackson.core:jackson-core</include>
+                  <include>com.fasterxml.jackson.core:jackson-databind</include>
+                  <include>com.jayway.jsonpath:json-path</include>
                 </includes>
               </artifactSet>
               <filters>
