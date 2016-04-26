@@ -11,6 +11,7 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.jolokia.server.core.service.api.AbstractJolokiaService;
 import org.jolokia.server.core.service.serializer.SerializeOptions;
 import org.jolokia.server.core.service.serializer.Serializer;
+import org.jolokia.server.core.service.serializer.WriteRequestValues;
 import org.jolokia.server.core.util.ClassUtil;
 import org.jolokia.server.core.util.EscapeUtil;
 import org.jolokia.service.serializer.object.OpenTypeDeserializer;
@@ -84,24 +85,15 @@ public class JacksonSerializer extends AbstractJolokiaService<Serializer> implem
         return null;
     }
 
-    public Object setInnerValue(Object pOuterObject, Object pNewValue, List<String> pPathParts) throws AttributeNotFoundException, IllegalAccessException, InvocationTargetException {
-        /* FIXME the semantics are not respecting the contract:
-           updated value is returned instead of old one and pOuterObject being changed "in-place"
-           updating Serializer IF would be cool for it to behave more as a function call
-           TBD
-           highly experimental.
-        */
+    public WriteRequestValues setInnerValue(Object pOuterObject, Object pNewValue, List<String> pPathParts) throws AttributeNotFoundException, IllegalAccessException, InvocationTargetException {
         if (pOuterObject == null) {
             return null;
         }
         String path = EscapeUtil.combineToPath(pPathParts);
-        if (path == null) {
-            return pOuterObject;
-        } else {
-            String originalJson = (String) serialize(pOuterObject, Collections.<String>emptyList(), null);
-            String updatedJson = JsonPath.parse(originalJson, jsonPathconfiguration).set(path, pNewValue).jsonString();
-            return deserialize(pOuterObject.getClass().getName(), updatedJson);
-        }
+        String originalJson = (String) serialize(pOuterObject, Collections.<String>emptyList(), null);
+        String updatedJson = JsonPath.parse(originalJson, jsonPathconfiguration).set(path, pNewValue).jsonString();
+        return  new WriteRequestValues(deserialize(pOuterObject.getClass().getName(), updatedJson), );
+
     }
 
     public Object deserializeOpenType(OpenType<?> pOpenType, Object pValue) {
